@@ -1,6 +1,7 @@
 package com.tallcraft.nerfphantoms;
 
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -14,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
 
@@ -81,8 +83,18 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onCreateSpawn(CreatureSpawnEvent event) {
+        World world = event.getLocation().getWorld();
+        if(config.getList("enabledWorlds").contains(world.getName())) {
+            logger.info("World is in list");
+            nerf(event);
+        } else {
+            logger.info("World is not in list");
+        }
+    }
+
+    private void nerf(CreatureSpawnEvent event) {
         if (event.getEntity().getType() == EntityType.PHANTOM
-        && (!config.getBoolean("onlyNerfNatural") ||
+                && (!config.getBoolean("onlyNerfNatural") ||
                 event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL)
         ) {
             if(!config.getBoolean("allowNaturalSpawn")) {
@@ -106,6 +118,12 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
 
         MemoryConfiguration defaultConfig = new MemoryConfiguration();
 
+        ArrayList<String> worldNames = new ArrayList<>();
+        for(World world : Bukkit.getWorlds()) {
+            worldNames.add(world.getName());
+        }
+
+        defaultConfig.set("enabledWorlds", worldNames);
         defaultConfig.set("allowNaturalSpawn", true);
         defaultConfig.set("onlyNerfNatural", true);
         defaultConfig.set("muteSound", false);
