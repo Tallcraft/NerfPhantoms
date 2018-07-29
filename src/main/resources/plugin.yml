@@ -1,0 +1,27 @@
+name: NerfPhantoms
+version: ${project.version}
+main: com.tallcraft.nerfphantoms.NerfPhantoms
+prefix: NerfPhantoms
+authors: [Tallcraft]
+description: Nerf Phantom monsters
+website: https://tallcraft.com
+commands:
+  nerfphantoms:
+    usage: /nerfphantoms <kill|reload>
+    permission-message: You don't have permission.
+permissions:
+  nerfphantoms.*:
+    description: Gives access to all NerfPhantoms commands
+    default: op
+    children:
+      nerfphantoms.all: true
+  nerfphantoms.all:
+    description: Gives access to all NerfPhantoms commands
+    children:
+      nerfphantoms.reload: true
+  nerfphantoms.reload:
+    description: Reload plugin config
+    default: false
+  nerfphantoms.kill:
+    description: Kill all phantoms in current world
+    default: false,
