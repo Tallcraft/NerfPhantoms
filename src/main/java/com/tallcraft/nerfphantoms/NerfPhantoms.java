@@ -1,5 +1,6 @@
 package com.tallcraft.nerfphantoms;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -24,6 +25,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        new Metrics(this);
         initConfig();
         getServer().getPluginManager().registerEvents(this, this);
     }
@@ -32,8 +34,6 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         if(args.length == 0) {
             return false;
         }
-
-
 
         if(args[0].equalsIgnoreCase("reload")) {
             if(!sender.hasPermission("nerfphantoms.reload")) {
