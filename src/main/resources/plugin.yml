@@ -5,6 +5,7 @@ prefix: NerfPhantoms
 authors: [Tallcraft]
 description: Nerf Phantom monsters
 website: https://tallcraft.com
+api-version: 1.13
 commands:
   nerfphantoms:
     usage: /nerfphantoms <kill|reload>
@@ -19,9 +20,10 @@ permissions:
     description: Gives access to all NerfPhantoms commands
     children:
       nerfphantoms.reload: true
+      nerfphantoms.kill: true
   nerfphantoms.reload:
     description: Reload plugin config
     default: false
   nerfphantoms.kill:
     description: Kill all phantoms in current world
-    default: false,
+    default: false
