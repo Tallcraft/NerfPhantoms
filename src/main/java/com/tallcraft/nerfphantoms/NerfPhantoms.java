@@ -85,10 +85,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
     public void onCreateSpawn(CreatureSpawnEvent event) {
         World world = event.getLocation().getWorld();
         if(config.getList("enabledWorlds").contains(world.getName())) {
-            logger.info("World is in list");
             nerf(event);
-        } else {
-            logger.info("World is not in list");
         }
     }
 
