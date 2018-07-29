@@ -1,8 +1,10 @@
 # NerfPhantoms
 Bukkit plugin which allows nerfing Phantom mobs introduced in Minecraft 1.13
 
+[SpigotMC plugin page](https://www.spigotmc.org/resources/nerfphantoms.59218/)
+
 ## Configuration
-```
+``` yaml
 # Disable or enable natural phantom spawn
 allowNaturalSpawn: true
 
@@ -28,3 +30,23 @@ fixedSize:
 ## Commands
 `/nerfphantoms reload`: Reload options from the configuration file
 `/nerfphantoms kill`: Kill all Phantoms in your current world.
+
+## Permissions
+``` yaml
+nerfphantoms.*:
+  description: Gives access to all NerfPhantoms commands
+  default: op
+  children:
+    nerfphantoms.all: true
+nerfphantoms.all:
+  description: Gives access to all NerfPhantoms commands
+  children:
+    nerfphantoms.reload: true
+    nerfphantoms.kill: true
+nerfphantoms.reload:
+  description: Reload plugin config
+  default: false
+nerfphantoms.kill:
+  description: Kill all phantoms in current world
+  default: false
+```
