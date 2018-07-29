@@ -5,6 +5,12 @@ Bukkit plugin which allows nerfing Phantom mobs introduced in Minecraft 1.13
 
 ## Configuration
 ``` yaml
+# Whitelist of worlds to enable the plugin in. Includes all worlds by default
+enabledWorlds:
+- world
+- world_nether
+- world_the_end
+
 # Disable or enable natural phantom spawn
 allowNaturalSpawn: true
 
@@ -16,6 +22,9 @@ muteSound: false
 
 # Disable phantom AI. Causes them to hover in one position and not move.
 disableAI: false
+
+# Phantom damage to player modifier. PhantomDamage * damageModifier = Damage to player
+damageModifier: 1.0
 
 # Set phantom health, default is 20. If you set it to 0 they die instantly.
 health: 20.0

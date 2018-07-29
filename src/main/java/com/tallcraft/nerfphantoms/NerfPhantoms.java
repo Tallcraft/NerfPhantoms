@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -89,6 +90,24 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         }
     }
 
+    @EventHandler
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        Entity damager = event.getDamager();
+        Entity victim = event.getEntity();
+        if(!(victim instanceof Player) || !(damager instanceof Phantom) ) {
+            return;
+        }
+        // Phantom damages player
+        // => Modify damage
+        double damageModifier =  config.getDouble("damageModifier");
+        double nerfedDamage = roundToHalf(event.getDamage() * damageModifier);
+        event.setDamage(nerfedDamage);
+    }
+
+    private static double roundToHalf(double d) {
+        return Math.round(d * 2) / 2.0;
+    }
+
     private void nerf(CreatureSpawnEvent event) {
         Entity entity = event.getEntity();
 
@@ -136,6 +155,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         defaultConfig.set("muteSound", false);
         defaultConfig.set("disableAI", false);
         defaultConfig.set("health", 20d);
+        defaultConfig.set("damageModifier", 1.0);
         defaultConfig.set("fixedSize.enabled", false);
         defaultConfig.set("fixedSize.value", 1);
 
