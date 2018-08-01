@@ -94,7 +94,8 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity damager = event.getDamager();
         Entity victim = event.getEntity();
-        if(!(victim instanceof Player) || !(damager instanceof Phantom) ) {
+
+        if(victim.getType() != EntityType.PLAYER || damager.getType() != EntityType.PHANTOM ) {
             return;
         }
         // Phantom damages player
