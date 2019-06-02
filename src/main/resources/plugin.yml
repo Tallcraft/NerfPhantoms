@@ -5,7 +5,7 @@ prefix: NerfPhantoms
 authors: [Tallcraft]
 description: Nerf Phantom monsters
 website: https://tallcraft.com
-api-version: 1.14
+api-version: 1.13
 commands:
   nerfphantoms:
     usage: /nerfphantoms <kill|reload>
