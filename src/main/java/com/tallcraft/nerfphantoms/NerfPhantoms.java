@@ -59,7 +59,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
                 return true;
             }
             if (!(sender instanceof Player)) {
-                sender.sendMessage("Command has be executed by a player");
+                sender.sendMessage("Command has to be executed by a player");
                 return true;
             }
             Player player = (Player) sender;
