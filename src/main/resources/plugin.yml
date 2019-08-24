@@ -29,5 +29,8 @@ permissions:
     description: Kill all phantoms in current world
     default: false
   nerfphantoms.disablespawn.self:
-    description: Disable phantom spawning current player
+    description: Command to disable phantom spawning for player
+    default: false
+  nerfphantoms.disablespawn.auto:
+    description: Phantom spawn disable active by default for player
     default: false
