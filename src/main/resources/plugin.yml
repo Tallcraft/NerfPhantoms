@@ -8,7 +8,7 @@ website: https://tallcraft.com
 api-version: 1.13
 commands:
   nerfphantoms:
-    usage: /nerfphantoms <disable|kill|reload>
+    usage: /nerfphantoms <togglespawn|kill|reload>
     permission-message: You don't have permission.
 permissions:
   nerfphantoms.*:
