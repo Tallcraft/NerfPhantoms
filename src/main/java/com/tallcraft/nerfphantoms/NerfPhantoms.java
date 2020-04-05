@@ -36,6 +36,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
     public void onEnable() {
         new Metrics(this);
         initConfig();
+        getCommand("nerfphantoms").setTabCompleter(new TabCompletion());
         getServer().getPluginManager().registerEvents(this, this);
         new StatResetTask(this).runTaskTimerAsynchronously(this, 0L, 1200L);
     }
