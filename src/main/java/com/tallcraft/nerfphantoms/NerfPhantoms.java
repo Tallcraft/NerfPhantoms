@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public final class NerfPhantoms extends JavaPlugin implements Listener {
@@ -80,19 +81,35 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         }
 
         if (args[0].equalsIgnoreCase("togglespawn")) {
-            if (!sender.hasPermission("nerfphantoms.disablespawn.self")) {
-                sender.sendMessage(permissionMessage);
+            if(args.length==1) {
+                if (!sender.hasPermission("nerfphantoms.disablespawn.self")) {
+                    sender.sendMessage(permissionMessage);
+                    return true;
+                }
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage("Command has to be executed by a player");
+                    return true;
+                }
+                Player player = (Player) sender;
+                boolean state = togglePhantomSpawn(player);
+                player.sendMessage((state ? "Disabled" : "Enabled")
+                        + " phantom spawn for " + player.getDisplayName() + ".");
+                return true;
+            }else{
+                if (!sender.hasPermission("nerfphantoms.disablespawn.others")) {
+                    sender.sendMessage(permissionMessage);
+                    return true;
+                }
+                Player victim = Bukkit.getPlayer(args[1]);
+                if(victim==null){
+                    sender.sendMessage("Unable to find player!");
+                    return true;
+                }
+                boolean state = togglePhantomSpawn(victim);
+                sender.sendMessage((state ? "Disabled" : "Enabled")
+                        + " phantom spawn for " + victim.getDisplayName() + ".");
                 return true;
             }
-            if (!(sender instanceof Player)) {
-                sender.sendMessage("Command has to be executed by a player");
-                return true;
-            }
-            Player player = (Player) sender;
-            boolean state = togglePhantomSpawn(player);
-            player.sendMessage((state ? "Disabled" : "Enabled")
-                    + " phantom spawn for " + player.getDisplayName() + ".");
-            return true;
         }
 
         return false;

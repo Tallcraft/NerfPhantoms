@@ -2,13 +2,13 @@ name: NerfPhantoms
 version: ${project.version}
 main: com.tallcraft.nerfphantoms.NerfPhantoms
 prefix: NerfPhantoms
-authors: [Tallcraft]
+authors: [Tallcraft, Metype]
 description: Nerf Phantom monsters
 website: https://tallcraft.com
 api-version: 1.13
 commands:
   nerfphantoms:
-    usage: /nerfphantoms <togglespawn|kill|reload>
+    usage: /nerfphantoms <help | togglespawn | kill | reload>
     permission-message: You don't have permission.
 permissions:
   nerfphantoms.*:
@@ -29,8 +29,11 @@ permissions:
     description: Kill all phantoms in current world
     default: false
   nerfphantoms.disablespawn.self:
-    description: Command to disable phantom spawning for player
-    default: false
+    description: Command to disable phantom spawning for self
+    default: op
+  nerfphantoms.disablespawn.others:
+    description: Command to disable phantom spawning for other players
+    default: op
   nerfphantoms.disablespawn.auto:
     description: Phantom spawn disable active by default for player
     default: false
