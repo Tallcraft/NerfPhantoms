@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public final class NerfPhantoms extends JavaPlugin implements Listener {
@@ -36,6 +37,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
     public void onEnable() {
         new Metrics(this);
         initConfig();
+        getCommand("nerfphantoms").setTabCompleter(new TabCompletion());
         getServer().getPluginManager().registerEvents(this, this);
         new StatResetTask(this).runTaskTimerAsynchronously(this, 0L, 1200L);
     }
@@ -79,18 +81,33 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         }
 
         if (args[0].equalsIgnoreCase("togglespawn")) {
-            if (!sender.hasPermission("nerfphantoms.disablespawn.self")) {
+            if (args.length == 1) {
+                if (!sender.hasPermission("nerfphantoms.disablespawn.self")) {
+                    sender.sendMessage(permissionMessage);
+                    return true;
+                }
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage("Command has to be executed by a player");
+                    return true;
+                }
+                Player player = (Player) sender;
+                boolean state = togglePhantomSpawn(player);
+                player.sendMessage((state ? "Disabled" : "Enabled")
+                        + " phantom spawn for " + player.getDisplayName() + ".");
+                return true;
+            }
+            if (!sender.hasPermission("nerfphantoms.disablespawn.others")) {
                 sender.sendMessage(permissionMessage);
                 return true;
             }
-            if (!(sender instanceof Player)) {
-                sender.sendMessage("Command has to be executed by a player");
+            Player victim = Bukkit.getPlayer(args[1]);
+            if (victim == null) {
+                sender.sendMessage("Unable to find player!");
                 return true;
             }
-            Player player = (Player) sender;
-            boolean state = togglePhantomSpawn(player);
-            player.sendMessage((state ? "Disabled" : "Enabled")
-                    + " phantom spawn for " + player.getDisplayName() + ".");
+            boolean state = togglePhantomSpawn(victim);
+            sender.sendMessage((state ? "Disabled" : "Enabled")
+                    + " phantom spawn for " + victim.getDisplayName() + ".");
             return true;
         }
 
@@ -141,7 +158,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         Entity damager = event.getDamager();
         Entity victim = event.getEntity();
 
-        if(victim.getType() != EntityType.PLAYER || damager.getType() != EntityType.PHANTOM ) {
+        if (victim.getType() != EntityType.PLAYER || damager.getType() != EntityType.PHANTOM) {
             return;
         }
 
@@ -151,7 +168,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
 
         // Phantom damages player
         // => Modify damage
-        double damageModifier =  config.getDouble("damageModifier");
+        double damageModifier = config.getDouble("damageModifier");
         double nerfedDamage = roundToHalf(event.getDamage() * damageModifier);
         event.setDamage(nerfedDamage);
     }
