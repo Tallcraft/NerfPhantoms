@@ -35,6 +35,5 @@ public class TabCompletion implements TabCompleter {
             list.add(p.getName());
         }
         return list;
-        return null;
     }
 }
