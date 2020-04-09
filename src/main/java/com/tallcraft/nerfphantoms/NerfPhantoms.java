@@ -81,7 +81,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         }
 
         if (args[0].equalsIgnoreCase("togglespawn")) {
-            if(args.length==1) {
+            if (args.length == 1) {
                 if (!sender.hasPermission("nerfphantoms.disablespawn.self")) {
                     sender.sendMessage(permissionMessage);
                     return true;
@@ -95,21 +95,20 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
                 player.sendMessage((state ? "Disabled" : "Enabled")
                         + " phantom spawn for " + player.getDisplayName() + ".");
                 return true;
-            }else{
-                if (!sender.hasPermission("nerfphantoms.disablespawn.others")) {
-                    sender.sendMessage(permissionMessage);
-                    return true;
-                }
-                Player victim = Bukkit.getPlayer(args[1]);
-                if(victim==null){
-                    sender.sendMessage("Unable to find player!");
-                    return true;
-                }
-                boolean state = togglePhantomSpawn(victim);
-                sender.sendMessage((state ? "Disabled" : "Enabled")
-                        + " phantom spawn for " + victim.getDisplayName() + ".");
+            }
+            if (!sender.hasPermission("nerfphantoms.disablespawn.others")) {
+                sender.sendMessage(permissionMessage);
                 return true;
             }
+            Player victim = Bukkit.getPlayer(args[1]);
+            if (victim == null) {
+                sender.sendMessage("Unable to find player!");
+                return true;
+            }
+            boolean state = togglePhantomSpawn(victim);
+            sender.sendMessage((state ? "Disabled" : "Enabled")
+                    + " phantom spawn for " + victim.getDisplayName() + ".");
+            return true;
         }
 
         return false;
@@ -159,7 +158,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         Entity damager = event.getDamager();
         Entity victim = event.getEntity();
 
-        if(victim.getType() != EntityType.PLAYER || damager.getType() != EntityType.PHANTOM ) {
+        if (victim.getType() != EntityType.PLAYER || damager.getType() != EntityType.PHANTOM) {
             return;
         }
 
@@ -169,7 +168,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
 
         // Phantom damages player
         // => Modify damage
-        double damageModifier =  config.getDouble("damageModifier");
+        double damageModifier = config.getDouble("damageModifier");
         double nerfedDamage = roundToHalf(event.getDamage() * damageModifier);
         event.setDamage(nerfedDamage);
     }

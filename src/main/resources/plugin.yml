@@ -22,6 +22,7 @@ permissions:
       nerfphantoms.reload: true
       nerfphantoms.kill: true
       nerfphantoms.disablespawn.self: true
+      nerfphantoms.disablespawn.other: true
   nerfphantoms.reload:
     description: Reload plugin config
     default: false
