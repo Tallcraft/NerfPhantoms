@@ -111,6 +111,64 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("disablespawn")) {
+            if (args.length == 1) {
+                if (!sender.hasPermission("nerfphantoms.disablespawn.self")) {
+                    sender.sendMessage(permissionMessage);
+                    return true;
+                }
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage("Command has to be executed by a player");
+                    return true;
+                }
+                Player player = (Player) sender;
+                boolean state = setPhantomSpawn(player,false);
+                player.sendMessage("Disabled phantom spawn for " + player.getDisplayName() + ".");
+                return true;
+            }
+            if (!sender.hasPermission("nerfphantoms.disablespawn.others")) {
+                sender.sendMessage(permissionMessage);
+                return true;
+            }
+            Player victim = Bukkit.getPlayer(args[1]);
+            if (victim == null) {
+                sender.sendMessage("Unable to find player!");
+                return true;
+            }
+            boolean state = setPhantomSpawn(victim,false);
+            sender.sendMessage("Disabled phantom spawn for " + victim.getDisplayName() + ".");
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("enablespawn")) {
+            if (args.length == 1) {
+                if (!sender.hasPermission("nerfphantoms.disablespawn.self")) {
+                    sender.sendMessage(permissionMessage);
+                    return true;
+                }
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage("Command has to be executed by a player");
+                    return true;
+                }
+                Player player = (Player) sender;
+                boolean state = setPhantomSpawn(player,true);
+                player.sendMessage("Enabled phantom spawn for " + player.getDisplayName() + ".");
+                return true;
+            }
+            if (!sender.hasPermission("nerfphantoms.disablespawn.others")) {
+                sender.sendMessage(permissionMessage);
+                return true;
+            }
+            Player victim = Bukkit.getPlayer(args[1]);
+            if (victim == null) {
+                sender.sendMessage("Unable to find player!");
+                return true;
+            }
+            boolean state = setPhantomSpawn(victim,true);
+            sender.sendMessage("Enabled phantom spawn for " + victim.getDisplayName() + ".");
+            return true;
+        }
+
         return false;
     }
 
@@ -124,6 +182,21 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
             player.setStatistic(Statistic.TIME_SINCE_REST, 0);
         }
         phantomDisabled.add(player);
+        return true;
+    }
+
+    private boolean setPhantomSpawn(Player player,boolean state) {
+        if (phantomDisabled.contains(player)&&state) {
+            phantomDisabled.remove(player);
+            return false;
+        }
+        // Initial stat reset, subsequent calls will be done by scheduled task
+        if (isWorldEnabled(player.getWorld())) {
+            player.setStatistic(Statistic.TIME_SINCE_REST, 0);
+        }
+        if(!state) {
+            phantomDisabled.add(player);
+        }
         return true;
     }
 

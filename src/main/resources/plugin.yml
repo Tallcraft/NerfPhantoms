@@ -8,7 +8,7 @@ website: https://tallcraft.com
 api-version: 1.13
 commands:
   nerfphantoms:
-    usage: /nerfphantoms <help | togglespawn | kill | reload>
+    usage: /nerfphantoms <help | togglespawn | enablespawn | disablespawn | kill | reload>
     permission-message: You don't have permission.
 permissions:
   nerfphantoms.*:
@@ -30,10 +30,10 @@ permissions:
     description: Kill all phantoms in current world
     default: false
   nerfphantoms.disablespawn.self:
-    description: Command to disable phantom spawning for self
+    description: Command to disable/enable phantom spawning for self
     default: op
   nerfphantoms.disablespawn.others:
-    description: Command to disable phantom spawning for other players
+    description: Command to disable/enable phantom spawning for other players
     default: op
   nerfphantoms.disablespawn.auto:
     description: Phantom spawn disable active by default for player

@@ -13,11 +13,13 @@ public class TabCompletion implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("nerfphantoms") && args.length == 1) {
-            List<String> list = new ArrayList<>();
+            List<String> list = new ArrayList<String>();
             list.add("help");
 
             if (sender.hasPermission("nerfphantoms.disablespawn.self")) {
                 list.add("togglespawn");
+                list.add("disablespawn");
+                list.add("enablespawn");
             }
 
             if (sender.hasPermission("nerfphantoms.reload")) {
@@ -27,8 +29,13 @@ public class TabCompletion implements TabCompleter {
             if (sender.hasPermission("nerfphantoms.kill")) {
                 list.add("kill");
             }
-
-            return list;
+            List<String> output = new ArrayList<String>();
+            for (String command : list) {
+                if (command.startsWith(args[0])) {
+                    output.add(command);
+                }
+            }
+            return output;
         }
         List<String> list = new ArrayList<>();
         for (Player p : Bukkit.getOnlinePlayers()) {
