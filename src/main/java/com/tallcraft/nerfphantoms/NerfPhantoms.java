@@ -20,6 +20,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -137,32 +138,40 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
     }
 
     private boolean togglePhantomSpawn(Player player, boolean persist) {
-        if (phantomDisabled.contains(player)) {
+        boolean isDisabled = phantomDisabled.contains(player);
+
+        if (isDisabled) {
             phantomDisabled.remove(player);
-            if (persist && storage != null) {
-                try {
-                    storage.setPhantomDisabled(player.getUniqueId(), false);
-                } catch (SQLException throwables) {
-                    logger.info("Error while updating player data in storage");
-                    throwables.printStackTrace();
-                }
+        } else {
+            // Initial stat reset, subsequent calls will be done by scheduled task
+            if (isWorldEnabled(player.getWorld())) {
+                // We could be in an async context here, schedule the bukkit api access sync.
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        player.setStatistic(Statistic.TIME_SINCE_REST, 0);
+                    }
+                }.runTask(this);
             }
-            return false;
+            phantomDisabled.add(player);
         }
-        // Initial stat reset, subsequent calls will be done by scheduled task
-        if (isWorldEnabled(player.getWorld())) {
-            player.setStatistic(Statistic.TIME_SINCE_REST, 0);
-        }
-        phantomDisabled.add(player);
+
+        // Store setting in database (async)
         if (persist && storage != null) {
-            try {
-                storage.setPhantomDisabled(player.getUniqueId(), true);
-            } catch (SQLException throwables) {
-                logger.info("Error while updating player data in storage");
-                throwables.printStackTrace();
-            }
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    try {
+                        storage.setPhantomDisabled(player.getUniqueId(), !isDisabled);
+                    } catch (SQLException throwables) {
+                        logger.info("Error while updating player data in storage");
+                        throwables.printStackTrace();
+                    }
+                }
+            }.runTaskAsynchronously(this);
         }
-        return true;
+
+        return !isDisabled;
     }
 
     boolean isWorldEnabled(World world) {
@@ -224,15 +233,24 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
             return;
         }
 
-        // Import phantom disabled state from storage (if enabled)
-        try {
-            if (storage != null && storage.getPhantomDisabled(player.getUniqueId())) {
-                togglePhantomSpawn(player, false);
-            }
-        } catch (SQLException throwables) {
-            logger.info("Error while fetching player data from storage");
-            throwables.printStackTrace();
+        if(storage == null) {
+            return;
         }
+        // Check storage for disabled player setting (async)
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                // Import phantom disabled state from storage (if enabled)
+                try {
+                    if (storage.getPhantomDisabled(player.getUniqueId())) {
+                        togglePhantomSpawn(player, false);
+                    }
+                } catch (SQLException throwables) {
+                    logger.info("Error while fetching player data from storage");
+                    throwables.printStackTrace();
+                }
+            }
+        }.runTaskAsynchronously(this);
     }
 
     private static double roundToHalf(double d) {
