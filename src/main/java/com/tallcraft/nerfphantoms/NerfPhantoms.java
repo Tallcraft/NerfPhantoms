@@ -6,6 +6,7 @@ import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
@@ -20,15 +21,16 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public final class NerfPhantoms extends JavaPlugin implements Listener {
     private final Logger logger = Logger.getLogger(this.getName());
+    private Storage storage;
     private FileConfiguration config;
     Set<Player> phantomDisabled = ConcurrentHashMap.newKeySet();
 
@@ -37,10 +39,26 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
     public void onEnable() {
         new Metrics(this);
         initConfig();
+
+        // Initialize database if enabled
+        ConfigurationSection databaseCfg = config.getConfigurationSection("database");
+        if(databaseCfg != null && databaseCfg.getBoolean("enabled")) {
+            storage = new Storage(databaseCfg);
+            try {
+                storage.init();
+                logger.info("Database connection established");
+            } catch(SQLException ex) {
+                storage = null;
+                logger.info("Error while connection to database");
+                ex.printStackTrace();
+            }
+        }
+
         getCommand("nerfphantoms").setTabCompleter(new TabCompletion());
         getServer().getPluginManager().registerEvents(this, this);
         new StatResetTask(this).runTaskTimerAsynchronously(this, 0L, 1200L);
     }
+
 
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         if (args.length == 0) {
@@ -115,8 +133,20 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
     }
 
     private boolean togglePhantomSpawn(Player player) {
+        return this.togglePhantomSpawn(player, true);
+    }
+
+    private boolean togglePhantomSpawn(Player player, boolean persist) {
         if (phantomDisabled.contains(player)) {
             phantomDisabled.remove(player);
+            if (persist && storage != null) {
+                try {
+                    storage.setPhantomDisabled(player.getUniqueId(), false);
+                } catch (SQLException throwables) {
+                    logger.info("Error while updating player data in storage");
+                    throwables.printStackTrace();
+                }
+            }
             return false;
         }
         // Initial stat reset, subsequent calls will be done by scheduled task
@@ -124,6 +154,14 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
             player.setStatistic(Statistic.TIME_SINCE_REST, 0);
         }
         phantomDisabled.add(player);
+        if (persist && storage != null) {
+            try {
+                storage.setPhantomDisabled(player.getUniqueId(), true);
+            } catch (SQLException throwables) {
+                logger.info("Error while updating player data in storage");
+                throwables.printStackTrace();
+            }
+        }
         return true;
     }
 
@@ -182,7 +220,18 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (player.hasPermission("nerfphantoms.disablespawn.auto")) {
-            togglePhantomSpawn(player);
+            togglePhantomSpawn(player, false);
+            return;
+        }
+
+        // Import phantom disabled state from storage (if enabled)
+        try {
+            if (storage != null && storage.getPhantomDisabled(player.getUniqueId())) {
+                togglePhantomSpawn(player, false);
+            }
+        } catch (SQLException throwables) {
+            logger.info("Error while fetching player data from storage");
+            throwables.printStackTrace();
         }
     }
 
@@ -239,6 +288,15 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         defaultConfig.set("damageModifier", 1.0);
         defaultConfig.set("fixedSize.enabled", false);
         defaultConfig.set("fixedSize.value", 1);
+
+        ConfigurationSection db = defaultConfig.createSection("database");
+        db.set("enabled", false);
+        db.set("type", "mysql");
+        db.set("host", "localhost");
+        db.set("port", 3306);
+        db.set("name", "nerfphantoms");
+        db.set("username", "user");
+        db.set("password", "123456");
 
         config.setDefaults(defaultConfig);
         config.options().copyDefaults(true);
