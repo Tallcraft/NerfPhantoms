@@ -34,6 +34,17 @@ fixedSize:
   enabled: false
   # How big should phantoms be?
   value: 1
+
+# Database configuration (default off)
+# The database is used to remember if the player toggled phantoms on or off.
+database:
+  enabled: false
+  type: mysql
+  name: nerfphantoms
+  host: localhost
+  port: 3306
+  username: root
+  password: '123456'
 ```
 
 ## Commands
