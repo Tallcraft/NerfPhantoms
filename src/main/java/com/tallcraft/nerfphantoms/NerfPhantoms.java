@@ -25,6 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -178,7 +179,10 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         if (world == null) {
             return false;
         }
-        return config.getStringList("enabledWorlds").contains(world.getName());
+        List<String> enabledWorlds = config.getStringList("enabledWorlds");
+        // If no worlds are defined in "enabledWorlds", disable allowlist functionality and treat
+        // all worlds as enabled.
+        return enabledWorlds.size() == 0 || enabledWorlds.contains(world.getName());
     }
 
     private int killAllPhantoms(World world) {
@@ -319,5 +323,13 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         config.setDefaults(defaultConfig);
         config.options().copyDefaults(true);
         saveConfig();
+
+        // Warn if "enabledWorlds" contains unknown worlds.
+        List<String> enabledWorlds = config.getStringList("enabledWorlds");
+        for(String worldName : enabledWorlds) {
+            if(Bukkit.getWorld(worldName) == null) {
+                logger.warning("Enabled world list contains unknown world '" + worldName + "'.");
+            }
+        }
     }
 }

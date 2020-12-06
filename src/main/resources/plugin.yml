@@ -6,6 +6,8 @@ authors: [Tallcraft, Metype]
 description: Nerf Phantom monsters
 website: https://tallcraft.com
 api-version: 1.13
+softdepend: [MultiverseCore]
+load: POSTWORLD
 commands:
   nerfphantoms:
     usage: /nerfphantoms <help | togglespawn | kill | reload>
