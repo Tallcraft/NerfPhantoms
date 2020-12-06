@@ -178,7 +178,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         if (world == null) {
             return false;
         }
-        return config.getList("enabledWorlds").contains(world.getName());
+        return config.getStringList("enabledWorlds").contains(world.getName());
     }
 
     private int killAllPhantoms(World world) {
