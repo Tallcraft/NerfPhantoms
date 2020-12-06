@@ -294,6 +294,15 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
     private void initConfig() {
         config = this.getConfig();
 
+        // Warn if "enabledWorlds" contains unknown worlds.
+        // If config isn't initialized at this point "enabledWorlds" will be an empty list.
+        List<String> enabledWorlds = config.getStringList("enabledWorlds");
+        for(String worldName : enabledWorlds) {
+            if(Bukkit.getWorld(worldName) == null) {
+                logger.warning("Config entry \"enabledWorlds\" contains unknown world '" + worldName + "'.");
+            }
+        }
+
         MemoryConfiguration defaultConfig = new MemoryConfiguration();
 
         ArrayList<String> worldNames = new ArrayList<>();
@@ -323,13 +332,5 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         config.setDefaults(defaultConfig);
         config.options().copyDefaults(true);
         saveConfig();
-
-        // Warn if "enabledWorlds" contains unknown worlds.
-        List<String> enabledWorlds = config.getStringList("enabledWorlds");
-        for(String worldName : enabledWorlds) {
-            if(Bukkit.getWorld(worldName) == null) {
-                logger.warning("Enabled world list contains unknown world '" + worldName + "'.");
-            }
-        }
     }
 }
