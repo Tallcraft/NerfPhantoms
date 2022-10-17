@@ -4,6 +4,9 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.sql.*;
 import java.util.UUID;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Storage {
     private final String type;
@@ -24,11 +27,18 @@ public class Storage {
         this.password = config.getString("password");
     }
 
-    public void init() throws SQLException {
+    public void init(JavaPlugin plugin) throws SQLException {
         // Setup database connection
-        connection = DriverManager.getConnection(
-                "jdbc:" + type + "://" + host + ":" + port + "/" + name,
-                username, password);
+        
+        if (type.equals("sqlite")) {
+            connection = DriverManager.getConnection(
+                    "jdbc:sqlite:" + plugin.getDataFolder() + "/" + name + ".db",
+                    username, password);
+        } else {
+            connection = DriverManager.getConnection(
+                    "jdbc:" + type + "://" + host + ":" + port + "/" + name,
+                    username, password);
+        }
 
         // Initialize table if it doesn't exist
         Statement statement = connection.createStatement();
@@ -52,17 +62,17 @@ public class Storage {
             throw new IllegalArgumentException("UUID can't be null");
         }
 
+        String sql = "DELETE FROM nerfphantoms_phantom_disabled WHERE uuid = ?";
+        PreparedStatement statement = this.connection.prepareStatement(sql);
+        statement.setString(1, uuid.toString());
+        statement.executeUpdate();
+
         if (isDisabled) {
-            final String sql = "INSERT IGNORE INTO nerfphantoms_phantom_disabled (uuid) VALUES (?)";
-            PreparedStatement statement = this.connection.prepareStatement(sql);
+            sql = "INSERT INTO nerfphantoms_phantom_disabled (uuid) VALUES (?)";
+            statement = this.connection.prepareStatement(sql);
             statement.setString(1, uuid.toString());
             statement.executeUpdate();
             return;
         }
-
-        final String sql = "DELETE FROM nerfphantoms_phantom_disabled WHERE uuid = ?";
-        PreparedStatement statement = this.connection.prepareStatement(sql);
-        statement.setString(1, uuid.toString());
-        statement.executeUpdate();
     }
 }
