@@ -47,7 +47,7 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         if(databaseCfg != null && databaseCfg.getBoolean("enabled")) {
             storage = new Storage(databaseCfg);
             try {
-                storage.init();
+                storage.init(this);
                 logger.info("Database connection established");
             } catch(SQLException ex) {
                 storage = null;

@@ -47,6 +47,8 @@ database:
   password: '123456'
 ```
 
+With version 1.4.0, you can also use sqlite. Set `type` to sqlite and `name` to your file name. `host` and `port` will be ignored in that case.
+
 ## Commands
 `/nerfphantoms reload`: Reload options from the configuration file\
 `/nerfphantoms kill`: Kill all Phantoms in your current world.\
