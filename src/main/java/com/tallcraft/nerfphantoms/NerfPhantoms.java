@@ -321,8 +321,8 @@ public final class NerfPhantoms extends JavaPlugin implements Listener {
         defaultConfig.set("fixedSize.value", 1);
 
         ConfigurationSection db = defaultConfig.createSection("database");
-        db.set("enabled", false);
-        db.set("type", "mysql");
+        db.set("enabled", true);
+        db.set("type", "sqlite");
         db.set("host", "localhost");
         db.set("port", 3306);
         db.set("name", "nerfphantoms");
