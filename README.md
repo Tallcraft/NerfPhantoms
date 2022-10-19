@@ -35,11 +35,13 @@ fixedSize:
   # How big should phantoms be?
   value: 1
 
-# Database configuration (default off)
+# Database configuration
 # The database is used to remember if the player toggled phantoms on or off.
+# Defaults to sqlite where 'name' is the database file name. The other fields are ignored.
+# Change type to 'mysql' if you want the plugin to connect to a mySQL server.
 database:
   enabled: false
-  type: mysql
+  type: sqlite
   name: nerfphantoms
   host: localhost
   port: 3306
