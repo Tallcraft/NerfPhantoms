@@ -4,8 +4,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.sql.*;
 import java.util.UUID;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Storage {
